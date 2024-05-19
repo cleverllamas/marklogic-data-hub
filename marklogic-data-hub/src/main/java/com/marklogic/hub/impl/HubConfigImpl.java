@@ -826,7 +826,7 @@ public class HubConfigImpl implements HubConfig
     public String getMlPassword() {
         return mlPassword;
     }
-    
+
     public void setMlUsername(String mlUsername) {
         this.mlUsername = mlUsername;
     }
@@ -1314,7 +1314,7 @@ public class HubConfigImpl implements HubConfig
         else {
             projectProperties.setProperty("mlFlowOperatorRole", flowOperatorRoleName);
         }
-        
+
         if (dataHubAdminRoleName == null) {
             dataHubAdminRoleName = getEnvPropString(projectProperties, "mlDataHubAdminRole", environment.getProperty("mlDataHubAdminRole"));
         }
@@ -1790,7 +1790,9 @@ public class HubConfigImpl implements HubConfig
 
         initializeModulePaths(config);
 
-        config.setSchemasPath(getUserSchemasDir().toString());
+        List<String> paths = new ArrayList<>();
+        paths.add(getUserSchemasDir().toString());
+        config.setSchemaPaths(paths);
 
         Map<String, String> customTokens = getCustomTokens(config, config.getCustomTokens());
 
@@ -1807,7 +1809,7 @@ public class HubConfigImpl implements HubConfig
      *
      * But if the config paths have been customized - most likely via mlConfigPaths in gradle.properties - then this
      * method just ensures that they're relative to the DHF project directory.
-     * 
+     *
      * @param config
      */
     protected void initializeConfigDirs(AppConfig config) {
