@@ -211,7 +211,9 @@ public class MlcpRunner extends ProcessRunner {
                                     u.contains("guava") ||
                                     u.contains("apache") ||
                                     u.contains("commons") ||
-                                    u.contains("hadoop"))
+                                    u.contains("hadoop") ||
+                                    u.contains("stax2-api") ||
+                                    u.contains("re2j"))
                             ).collect(Collectors.joining(File.pathSeparator));
 
             //logger.warn("Classpath filtered to: " + filteredClasspathEntries);
