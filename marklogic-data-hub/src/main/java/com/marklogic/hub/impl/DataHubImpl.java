@@ -112,9 +112,9 @@ public class DataHubImpl implements DataHub {
     /**
      * Need to account for the group name in case the user has overridden the name of the "Default" group.
      *
-     * @param manageClient
-     * @param hubConfig
-     * @return
+     * @param manageClient The ManageClient to use for constructing the ServerManager
+     * @param hubConfig   The HubConfig to use for constructing the ServerManager
+     * @return ServerManager
      */
     protected ServerManager constructServerManager(ManageClient manageClient, HubConfig hubConfig) {
         AppConfig appConfig = hubConfig.getAppConfig();
@@ -243,9 +243,6 @@ public class DataHubImpl implements DataHub {
                 versionString = versions.getMarkLogicVersion();
             }
             int major = Integer.parseInt(versionString.replaceAll("([^.]+)\\..*", "$1"));
-            if (major != 9) {
-                return false;
-            }
             boolean isNightly = versionString.matches("[^-]+-(\\d{4})(\\d{2})(\\d{2})");
 
             //Support any 9.0 version >= 9.0-5.
@@ -268,24 +265,17 @@ public class DataHubImpl implements DataHub {
             String alteredString = StringUtils.join(modifiedMinor, modifiedHotFixNum);
             int ver = Integer.parseInt(alteredString);
 
-            //ver >= 500 => 9.0-5 and above is supported
-            if (!isNightly && ver < 500) {
-                return false;
-            }
+            // Using same logic as release/5.5.0 MarkLogicVersion.java supportsDataHubFramework
             if (isNightly) {
-                String dateString = versionString.replaceAll("[^-]+-(\\d{4})(\\d{2})(\\d{2})", "$1-$2-$3");
-                //Support all 9.0-nightly on or after 5/5/2018
-                Date minDate = new GregorianCalendar(2018, Calendar.MAY, 5).getTime();
-                Date date = new SimpleDateFormat("y-M-d").parse(dateString);
-                if (date.before(minDate)) {
-                    return false;
-                }
+                return true;
             }
+
+            // System.out.println("Major: " + major + " Minor: " + minor + " HotFix: " + hotFixNum + " Ver: " + ver);
+            return major > 9 || (major == 9 && ver >= 50);
 
         } catch (Exception e) {
             throw new ServerValidationException(e.toString());
         }
-        return true;
     }
 
     @Override
@@ -557,7 +547,7 @@ public class DataHubImpl implements DataHub {
     /**
      * In a provisioned environment, only the databases defined by this pattern can be updated.
      *
-     * @return
+     * @return Pattern
      */
     protected Pattern buildPatternForDatabasesToUpdateIndexesFor() {
         return Pattern.compile("(staging|final|job)-database.json");

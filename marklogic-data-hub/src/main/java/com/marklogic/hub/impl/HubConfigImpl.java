@@ -1810,7 +1810,7 @@ public class HubConfigImpl implements HubConfig
      * But if the config paths have been customized - most likely via mlConfigPaths in gradle.properties - then this
      * method just ensures that they're relative to the DHF project directory.
      *
-     * @param config
+     * @param config The AppConfig object to update
      */
     protected void initializeConfigDirs(AppConfig config) {
         final String defaultConfigPath = String.join(File.separator, "src", "main", "ml-config");
@@ -1841,7 +1841,7 @@ public class HubConfigImpl implements HubConfig
     /**
      * Need to initialize every module path as being relative to the current project directory.
      *
-     * @param config
+     * @param config The appconfig to initialize
      */
     protected void initializeModulePaths(AppConfig config) {
         List<String> modulePaths = new ArrayList<>();
@@ -1942,8 +1942,8 @@ public class HubConfigImpl implements HubConfig
      * properties plugin does. But it is being preserved for backwards compatibility in case any clients prior to
      * 4.1 were using HubConfigBuilder.withPropertiesFromEnvironment.
      *
-     * @param environment
-     * @return
+     * @param environment Environment name
+     * @return HubConfig
      */
     @JsonIgnore
     public HubConfig withPropertiesFromEnvironment(String environment) {
