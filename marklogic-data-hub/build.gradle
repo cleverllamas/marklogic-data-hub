@@ -97,31 +97,33 @@ node {
   nodeModulesDir = file("${project.projectDir}/src/trace-ui")
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+tasks.register('sourcesJar', Jar) {
+    dependsOn classes
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
-task cleanUI(type: Delete) {
-  delete 'src/main/resources/ml-modules/root/trace-ui'
+tasks.register('cleanUI', Delete) {
+    delete 'src/main/resources/ml-modules/root/trace-ui'
 }
 
-task npmInstallUI(type: NpmTask) {
+tasks.register('npmInstallUI', NpmTask) {
     args = ['install']
     dependsOn tasks.cleanUI
 }
 
-task buildUI(type: NpmTask) {
+tasks.register('buildUI', NpmTask) {
     args = ['run', 'build.prod']
     dependsOn tasks.npmInstallUI
 }
 
-task copyUIAssets(type: Copy) {
+tasks.register('copyUIAssets', Copy) {
     from 'src/trace-ui/dist'
     into 'src/main/resources/ml-modules/root/trace-ui'
     dependsOn tasks.buildUI
@@ -283,12 +285,12 @@ boolean certAuth = Boolean.parseBoolean(System.properties['certauth'])
 def props = new Properties()
 propFile.withInputStream { props.load(it) }
 
-task bootstrap(type: JavaExec) {
+tasks.register('bootstrap', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.marklogic.bootstrap.Installer'
 }
 
-task teardown(type: JavaExec) {
+tasks.register('teardown', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.marklogic.bootstrap.UnInstaller'
 }
@@ -301,35 +303,35 @@ test {
     classpath = project.sourceSets.test.runtimeClasspath
 }
 
-task testAcceptance(type: Test) {
-    useJUnitPlatform  {
+tasks.register('testAcceptance', Test) {
+    useJUnitPlatform {
         include 'com/marklogic/hub/**'
-        if (!(certAuth || sslRun)){
+        if (!(certAuth || sslRun)) {
             include 'com/marklogic/hub/PiiE2E.class'
         }
     }
 }
 
-task testIntegration(type: Test) {
-    useJUnitPlatform  {
+tasks.register('testIntegration', Test) {
+    useJUnitPlatform {
         include 'com/marklogic/hub_integration/**'
     }
 }
 
-task testBootstrap(type: Test) {
-    useJUnitPlatform  {
+tasks.register('testBootstrap', Test) {
+    useJUnitPlatform {
         include 'com/marklogic/bootstrap/**'
     }
 }
 
-task setupSSL{
-    doFirst{
+tasks.register('setupSSL') {
+    doFirst {
         def bootStrapHost = null
-        if(sslRun || certAuth){
+        if (sslRun || certAuth) {
             com.marklogic.mgmt.ManageClient manageClient = new ManageClient(new com.marklogic.mgmt.ManageConfig(mlHost, 8002, mlSecurityUsername, mlSecurityPassword))
             com.marklogic.mgmt.resource.hosts.HostManager hostManager = new HostManager(manageClient)
             bootStrapHost = hostManager.getHostNames().get(0)
-            if(! bootStrapHost.toLowerCase().contains("marklogic.com")){
+            if (!bootStrapHost.toLowerCase().contains("marklogic.com")) {
                 throw new GradleException("The test with current options will run only in marklogic.com domain")
             }
 
@@ -337,33 +339,33 @@ task setupSSL{
                 classpath = sourceSets.test.runtimeClasspath
                 main = 'com.marklogic.bootstrap.SSLsetup'
                 args = [mlHost, mlSecurityUsername, mlSecurityPassword, certAuth, sslRun]
-                }
             }
-            if(sslRun) {
-                //checking if one of the property is already set
-                if(props.getProperty('mlJobSimpleSsl')==null){
-                    propFile.append("\n" +
-                            "mlJobSimpleSsl=true\n" +
-                            "mlFinalSimpleSsl=true\n" +
-                            "mlAdminScheme=https\n" +
-                            "mlManageScheme=https\n" +
-                            "mlAppServicesSimpleSsl=true\n" +
-                            "mlManageSimpleSsl=true\n" +
-                            "mlStagingSimpleSsl=true")
-                }
+        }
+        if (sslRun) {
+            //checking if one of the property is already set
+            if (props.getProperty('mlJobSimpleSsl') == null) {
+                propFile.append("\n" +
+                    "mlJobSimpleSsl=true\n" +
+                    "mlFinalSimpleSsl=true\n" +
+                    "mlAdminScheme=https\n" +
+                    "mlManageScheme=https\n" +
+                    "mlAppServicesSimpleSsl=true\n" +
+                    "mlManageSimpleSsl=true\n" +
+                    "mlStagingSimpleSsl=true")
             }
-            if(certAuth) {
-                if(props.getProperty('mlStagingAuth')==null){
-                    propFile.append("\n" +
-                            "mlStagingAuth=certificate\n" +
-                            "mlFinalAuth=certificate\n" +
-                            "mlHost="+bootStrapHost+"\n"+
-                            "mlAdminScheme=https\n" +
-                            "mlFinalScheme=https\n" +
-                            "mlStagingScheme=https\n" +
-                            "mlManageScheme=https\n" +
-                            "mlJobScheme=https\n" +
-                            "mlJobAuth=certificate")
+        }
+        if (certAuth) {
+            if (props.getProperty('mlStagingAuth') == null) {
+                propFile.append("\n" +
+                    "mlStagingAuth=certificate\n" +
+                    "mlFinalAuth=certificate\n" +
+                    "mlHost=" + bootStrapHost + "\n" +
+                    "mlAdminScheme=https\n" +
+                    "mlFinalScheme=https\n" +
+                    "mlStagingScheme=https\n" +
+                    "mlManageScheme=https\n" +
+                    "mlJobScheme=https\n" +
+                    "mlJobAuth=certificate")
             }
         }
     }

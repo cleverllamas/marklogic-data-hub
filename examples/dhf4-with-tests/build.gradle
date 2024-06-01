@@ -11,7 +11,18 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.marklogic:marklogic-data-hub:4.3.3'
+
+
+    implementation 'com.marklogic:marklogic-data-movement-components:2.8.0'
+
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: '2.0.6.RELEASE'
+    implementation("org.springframework.boot:spring-boot-starter-actuator:2.0.6.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-web:2.0.6.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-websocket:2.0.6.RELEASE")
+
     mlBundle "com.marklogic:marklogic-unit-test-modules:1.4.0"
+
 
     testImplementation "com.marklogic:marklogic-junit5:1.4.0"
     testImplementation 'com.marklogic:ml-app-deployer:4.8.0'
