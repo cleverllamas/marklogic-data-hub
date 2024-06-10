@@ -29,3 +29,5 @@ node_modules/
 *.db
 ye-olde-project
 /bin/
+local-testing/test1
+local-testing/mnt
