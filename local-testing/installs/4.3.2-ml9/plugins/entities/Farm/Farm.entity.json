@@ -1,13 +1,13 @@
 {
   "info" : {
-    "title" : "Order",
+    "title" : "Farm",
     "version" : "0.0.1",
     "baseUri" : "http://example.com/",
-    "description" : "An Order entity"
+    "description" : "An Farm entity"
   },
   "definitions" : {
-    "Order" : {
-      "description" : "The Order entity root.",
+    "Farm" : {
+      "description" : "The Farm entity root.",
       "required" : [ ],
       "rangeIndex" : [ ],
       "elementRangeIndex" : [ ],

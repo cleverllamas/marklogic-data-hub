@@ -26,17 +26,17 @@ function createContent(id, rawContent, options) {
     source = rawContent;
   }
 
-  return extractInstanceOrder(source);
+  return extractInstanceFarm(source);
 }
   
 /**
 * Creates an object instance from some source document.
 * @param source  A document or node that contains
-*   data for populating a Order
+*   data for populating a Farm
 * @return An object with extracted data and
 *   metadata about the instance.
 */
-function extractInstanceOrder(source) {
+function extractInstanceFarm(source) {
   let attachments = source;
   // now check to see if we have XML or json, then create a node clone to operate of off
   if (source instanceof Element || source instanceof ObjectNode) {
@@ -55,7 +55,7 @@ function extractInstanceOrder(source) {
   // return the instance object
   return {
     '$attachments': attachments,
-    '$type': 'Order',
+    '$type': 'Farm',
     '$version': '0.0.1'
   }
 };

@@ -26,17 +26,17 @@ function createContent(id, rawContent, options) {
     source = rawContent;
   }
 
-  return extractInstanceProduct(source);
+  return extractInstanceLlama(source);
 }
   
 /**
 * Creates an object instance from some source document.
 * @param source  A document or node that contains
-*   data for populating a Product
+*   data for populating a Llama
 * @return An object with extracted data and
 *   metadata about the instance.
 */
-function extractInstanceProduct(source) {
+function extractInstanceLlama(source) {
   let attachments = source;
   // now check to see if we have XML or json, then create a node clone to operate of off
   if (source instanceof Element || source instanceof ObjectNode) {
@@ -55,7 +55,7 @@ function extractInstanceProduct(source) {
   // return the instance object
   return {
     '$attachments': attachments,
-    '$type': 'Product',
+    '$type': 'Llama',
     '$version': '0.0.1'
   }
 };

@@ -1,13 +1,13 @@
 {
   "info" : {
-    "title" : "Customer",
+    "title" : "Llama",
     "version" : "0.0.1",
     "baseUri" : "http://example.com/",
-    "description" : "An Customer entity"
+    "description" : "An Llama entity"
   },
   "definitions" : {
-    "Customer" : {
-      "description" : "The Customer entity root.",
+    "Llama" : {
+      "description" : "The Llama entity root.",
       "required" : [ ],
       "rangeIndex" : [ ],
       "elementRangeIndex" : [ ],
