@@ -110,20 +110,16 @@ Before we can create the input flows, we need to deploy the entities:
 ./gradlew hubCreateInputFlow -PentityName=Farm -PflowName=loadFarms -PdataFormat=json -PpluginFormat=sjs
 ````
 
-<!-- #### Run the Input Flow
+#### Run the Input Flow
 ````bash
 mlcp import \
     -transform_module "/data-hub/4/transforms/mlcp-flow-transform.sjs" \
     -transform_param "entity-name=Farm,flow-name=loadFarms,jobId=cl-farms" \
-    -input_file_path "/data/farms" \
+    -input_file_path "data/farms" \
     -input_file_type "json" \
-    -output_uri_replace "/data,''" \
     -host "localhost" \
-    -port "8010" \
-    -username "admin" \
-    -password "admin" \
-    -mode "local"
-```` -->
+    -port "8010"
+````
 
 ### Pasture
 
@@ -132,20 +128,16 @@ mlcp import \
 ./gradlew hubCreateInputFlow -PentityName=Pasture -PflowName=loadPastures -PdataFormat=json -PpluginFormat=sjs
 ````
 
-<!-- #### Run the Input Flow
+#### Run the Input Flow
 ````bash
 mlcp import \
     -transform_module "/data-hub/4/transforms/mlcp-flow-transform.sjs" \
     -transform_param "entity-name=Pasture,flow-name=loadPastures,jobId=cl-pastures" \
-    -input_file_path "/data/pastures" \
+    -input_file_path "data/pastures" \
     -input_file_type "json" \
-    -output_uri_replace "/data,''" \
     -host "localhost" \
-    -port "8010" \
-    -username "admin" \
-    -password "admin" \
-    -mode "local"
-```` -->
+    -port "8010"
+````
 
 ### Llama
 
@@ -154,17 +146,13 @@ mlcp import \
 ./gradlew hubCreateInputFlow -PentityName=Llama -PflowName=loadLlamas -PdataFormat=json -PpluginFormat=sjs
 ````
 
-<!-- #### Run the Input Flow
+#### Run the Input Flow
 ````bash
 mlcp import \
     -transform_module "/data-hub/4/transforms/mlcp-flow-transform.sjs" \
     -transform_param "entity-name=Llama,flow-name=loadLlamas,jobId=cl-llamas" \
-    -input_file_path "/data/llamas" \
+    -input_file_path "data/llamas" \
     -input_file_type "json" \
-    -output_uri_replace "/data,''" \
     -host "localhost" \
-    -port "8010" \
-    -username "admin" \
-    -password "admin" \
-    -mode "local"
-```` -->
+    -port "8010"
+````
