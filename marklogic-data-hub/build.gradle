@@ -44,9 +44,9 @@ dependencies {
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
     implementation "com.squareup.okhttp3:okhttp:4.10.0"
 
-    implementation("org.springframework.boot:spring-boot-starter-actuator:2.0.6.RELEASE")
-    implementation("org.springframework.boot:spring-boot-starter-web:2.0.6.RELEASE")
-    implementation("org.springframework.boot:spring-boot-starter-websocket:2.0.6.RELEASE")
+    // implementation("org.springframework.boot:spring-boot-starter-actuator:2.0.6.RELEASE")
+    // implementation("org.springframework.boot:spring-boot-starter-web:2.0.6.RELEASE")
+    // implementation("org.springframework.boot:spring-boot-starter-websocket:2.0.6.RELEASE")
 
     // JUnit Jupiter API and TestEngine implementation
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"

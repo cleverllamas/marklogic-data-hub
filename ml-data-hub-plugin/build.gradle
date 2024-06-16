@@ -62,9 +62,11 @@ dependencies {
 
     testImplementation('org.spockframework:spock-spring:1.2-groovy-2.5') {
         exclude module: 'groovy-all'
+        exclude module: 'groovy-templates'
     }
     testImplementation('org.spockframework:spock-core:1.2-groovy-2.5') {
         exclude module: 'groovy-all'
+        exclude module: 'groovy-templates'
     }
 
     testImplementation ('org.springframework.boot:spring-boot-starter-test:2.1.8.RELEASE') {
