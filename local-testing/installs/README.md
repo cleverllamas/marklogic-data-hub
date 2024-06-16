@@ -1,7 +1,7 @@
 # Tutorial for DHF 4.x
 
 ## Overview
-In this tutorial, you will set up a simple data hub containing harmonized online shopping data.
+In this tutorial, you will set up a simple data hub containing harmonized farm data.
 
 Imagine you work for a company that sells board games and board game accessories. You have three sets of data that must be harmonized so that an application can
 access them easily:
@@ -155,4 +155,121 @@ mlcp import \
     -input_file_type "json" \
     -host "localhost" \
     -port "8010"
+````
+
+## Harmonize the Farm Data by Mapping
+A harmonize flow is another series of plugins that harmonizes the data in the staging database and stores the results in the final database. Harmonization
+includes standardizing formats, enriching data, resolving duplicates, indexing, and other tasks.
+
+We can specify the source of an entity property value using one of two methods:
+
+* By customizing the default harmonization code.
+* By defining mappings that specify which fields in the raw datasets correspond with which properties in the entity model.
+
+Model-to-model mapping (between the source data model and the canonical entity model) was introduced in DHF v4.0.0 to enable users to easily create a
+harmonization flow without coding. Mappings are ideal when the source data can be easily converted for use as the value of the entity property; a simple
+conversion can be a difference in the label case or a difference in simple data types.
+
+We have already loaded the **Farm** raw data by:
+
+* creating the **Farm** entity and
+* creating and running the associated input flow.
+
+In this section, we will:
+
+* Define the entity model by adding properties to the entity model.
+* Define the mappings to specify which field in the dataset corresponds to the properties in the entity model.
+* Create and Run the Harmonize Flow.
+
+### Define the Entity Model
+We first define the entity model, which specifies the standard labels for the fields we want to harmonize. For the **Farm** dataset, we will harmonize two fields:
+`id` and `name`. Therefore, we must add those fields as properties to our **Farm** entity model.
+
+| Name | Type | Other settings | Notes |
+| --- | --- | --- | --- |
+| sku | string | key | Used as the primary key because the SKU is unique for each product. |
+| price | decimal | | Set as a decimal because we need to perform calculations with the price.|
+
+To define the **Farm** entity model:
+````json
+{
+  "info" : {
+    "title" : "Farm",
+    "version" : "0.0.1",
+    "baseUri" : "http://example.com/",
+    "description" : "An Farm entity"
+  },
+  "definitions" : {
+    "Farm" : {
+      "description" : "The Farm entity root.",
+      "required" : [ ],
+      "rangeIndex" : [ ],
+      "elementRangeIndex" : [ ],
+      "wordLexicon" : [ ],
+      "pii" : [ ],
+      "properties" : {
+        "id": {
+          "datatype": "int"
+        },
+        "name": {
+          "datatype": "string"
+        }
+      }
+    }
+  }
+}
+````
+
+### Define the Mappings
+For the **Farm** entity, we define the following simple mappings:
+
+| field in raw dataset (type) | property in entity model (type) | Notes |
+| --- | --- | --- |
+| id (string) | id (int) | Difference in types |
+| farmName (string) | name (string) | Difference between field names |
+
+To create a mapping named `FarmMapping` at `plugins/mappings/FarmMapping/FarmMapping.mapping.json`:
+
+````json
+{
+  "language" : "zxx",
+  "name" : "FarmMapping",
+  "description" : "Mapping for Farm",
+  "version" : 1,
+  "targetEntityType" : "http://example.org/Farm-0.0.1/Farm",
+  "sourceContext" : "//",
+  "sourceURI" : "/farms/1.json",
+  "properties" : {
+    "id" : {
+      "sourcedFrom" : "id"
+    },
+    "name" : {
+      "sourcedFrom" : "name"
+    }
+  }
+}
+````
+
+Before we can create the harmonization flow, we need to deploy the mapping::
+````bash
+./gradlew hubDeployUserArtifacts
+````
+
+### Create and Run the Harmonize Flow
+Harmonization uses the data in your **STAGING** database to generate canonical entity instances in the **FINAL** database.
+
+To create a harmonization flow for the **Farm** entity:
+````bash
+./gradlew hubCreateHarmonizeFlow -PentityName=Farm -PflowName=harmonizeFarms -PdataFormat=json -PpluginFormat=sjs -PmappingName=FarmMapping
+````
+
+When you create a flow with mapping, gradle automatically generates harmonization code based on the entity model and the mapping, we then need to deploy the
+code to MarkLogic Server:
+````bash
+./gradlew hubDeployUserArtifacts
+````
+
+Now we can run the harmonization flow:
+````bash
+./gradlew hubRunFlow -PentityName=Farm -PflowName=harmonizeFarms
 ````

@@ -1,10 +1,7 @@
 {
-  "type": "Feature",
-  "properties": {
-    "id": 1,
-    "name": "High Hill Farm",
-    "type": "farm"
-  },
+  "id": "1",
+  "farmName": "High Hill Farm",
+  "type": "farm",
   "geometry": {
     "coordinates": [
       [
