@@ -42,10 +42,11 @@ dependencies {
     implementation 'commons-io:commons-io:2.4'
     implementation 'org.apache.commons:commons-text:1.1'
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation "com.squareup.okhttp3:okhttp:4.10.0"
 
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-websocket")
+    // implementation("org.springframework.boot:spring-boot-starter-actuator:2.0.6.RELEASE")
+    // implementation("org.springframework.boot:spring-boot-starter-web:2.0.6.RELEASE")
+    // implementation("org.springframework.boot:spring-boot-starter-websocket:2.0.6.RELEASE")
 
     // JUnit Jupiter API and TestEngine implementation
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
@@ -97,33 +98,31 @@ node {
   nodeModulesDir = file("${project.projectDir}/src/trace-ui")
 }
 
-tasks.register('javadocJar', Jar) {
-    dependsOn javadoc
-    archiveClassifier = 'javadoc'
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
     from javadoc.destinationDir
 }
 
-tasks.register('sourcesJar', Jar) {
-    dependsOn classes
-    archiveClassifier = 'sources'
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
     from sourceSets.main.allSource
 }
 
-tasks.register('cleanUI', Delete) {
-    delete 'src/main/resources/ml-modules/root/trace-ui'
+task cleanUI(type: Delete) {
+  delete 'src/main/resources/ml-modules/root/trace-ui'
 }
 
-tasks.register('npmInstallUI', NpmTask) {
+task npmInstallUI(type: NpmTask) {
     args = ['install']
     dependsOn tasks.cleanUI
 }
 
-tasks.register('buildUI', NpmTask) {
+task buildUI(type: NpmTask) {
     args = ['run', 'build.prod']
     dependsOn tasks.npmInstallUI
 }
 
-tasks.register('copyUIAssets', Copy) {
+task copyUIAssets(type: Copy) {
     from 'src/trace-ui/dist'
     into 'src/main/resources/ml-modules/root/trace-ui'
     dependsOn tasks.buildUI
@@ -285,12 +284,12 @@ boolean certAuth = Boolean.parseBoolean(System.properties['certauth'])
 def props = new Properties()
 propFile.withInputStream { props.load(it) }
 
-tasks.register('bootstrap', JavaExec) {
+task bootstrap(type: JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.marklogic.bootstrap.Installer'
 }
 
-tasks.register('teardown', JavaExec) {
+task teardown(type: JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.marklogic.bootstrap.UnInstaller'
 }
@@ -303,35 +302,35 @@ test {
     classpath = project.sourceSets.test.runtimeClasspath
 }
 
-tasks.register('testAcceptance', Test) {
-    useJUnitPlatform {
+task testAcceptance(type: Test) {
+    useJUnitPlatform  {
         include 'com/marklogic/hub/**'
-        if (!(certAuth || sslRun)) {
+        if (!(certAuth || sslRun)){
             include 'com/marklogic/hub/PiiE2E.class'
         }
     }
 }
 
-tasks.register('testIntegration', Test) {
-    useJUnitPlatform {
+task testIntegration(type: Test) {
+    useJUnitPlatform  {
         include 'com/marklogic/hub_integration/**'
     }
 }
 
-tasks.register('testBootstrap', Test) {
-    useJUnitPlatform {
+task testBootstrap(type: Test) {
+    useJUnitPlatform  {
         include 'com/marklogic/bootstrap/**'
     }
 }
 
-tasks.register('setupSSL') {
-    doFirst {
+task setupSSL{
+    doFirst{
         def bootStrapHost = null
-        if (sslRun || certAuth) {
+        if(sslRun || certAuth){
             com.marklogic.mgmt.ManageClient manageClient = new ManageClient(new com.marklogic.mgmt.ManageConfig(mlHost, 8002, mlSecurityUsername, mlSecurityPassword))
             com.marklogic.mgmt.resource.hosts.HostManager hostManager = new HostManager(manageClient)
             bootStrapHost = hostManager.getHostNames().get(0)
-            if (!bootStrapHost.toLowerCase().contains("marklogic.com")) {
+            if(! bootStrapHost.toLowerCase().contains("marklogic.com")){
                 throw new GradleException("The test with current options will run only in marklogic.com domain")
             }
 
@@ -339,33 +338,33 @@ tasks.register('setupSSL') {
                 classpath = sourceSets.test.runtimeClasspath
                 main = 'com.marklogic.bootstrap.SSLsetup'
                 args = [mlHost, mlSecurityUsername, mlSecurityPassword, certAuth, sslRun]
+                }
             }
-        }
-        if (sslRun) {
-            //checking if one of the property is already set
-            if (props.getProperty('mlJobSimpleSsl') == null) {
-                propFile.append("\n" +
-                    "mlJobSimpleSsl=true\n" +
-                    "mlFinalSimpleSsl=true\n" +
-                    "mlAdminScheme=https\n" +
-                    "mlManageScheme=https\n" +
-                    "mlAppServicesSimpleSsl=true\n" +
-                    "mlManageSimpleSsl=true\n" +
-                    "mlStagingSimpleSsl=true")
+            if(sslRun) {
+                //checking if one of the property is already set
+                if(props.getProperty('mlJobSimpleSsl')==null){
+                    propFile.append("\n" +
+                            "mlJobSimpleSsl=true\n" +
+                            "mlFinalSimpleSsl=true\n" +
+                            "mlAdminScheme=https\n" +
+                            "mlManageScheme=https\n" +
+                            "mlAppServicesSimpleSsl=true\n" +
+                            "mlManageSimpleSsl=true\n" +
+                            "mlStagingSimpleSsl=true")
+                }
             }
-        }
-        if (certAuth) {
-            if (props.getProperty('mlStagingAuth') == null) {
-                propFile.append("\n" +
-                    "mlStagingAuth=certificate\n" +
-                    "mlFinalAuth=certificate\n" +
-                    "mlHost=" + bootStrapHost + "\n" +
-                    "mlAdminScheme=https\n" +
-                    "mlFinalScheme=https\n" +
-                    "mlStagingScheme=https\n" +
-                    "mlManageScheme=https\n" +
-                    "mlJobScheme=https\n" +
-                    "mlJobAuth=certificate")
+            if(certAuth) {
+                if(props.getProperty('mlStagingAuth')==null){
+                    propFile.append("\n" +
+                            "mlStagingAuth=certificate\n" +
+                            "mlFinalAuth=certificate\n" +
+                            "mlHost="+bootStrapHost+"\n"+
+                            "mlAdminScheme=https\n" +
+                            "mlFinalScheme=https\n" +
+                            "mlStagingScheme=https\n" +
+                            "mlManageScheme=https\n" +
+                            "mlJobScheme=https\n" +
+                            "mlJobAuth=certificate")
             }
         }
     }
