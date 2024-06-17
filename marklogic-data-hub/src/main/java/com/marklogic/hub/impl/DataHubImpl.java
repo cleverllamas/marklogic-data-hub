@@ -243,6 +243,12 @@ public class DataHubImpl implements DataHub {
                 versionString = versions.getMarkLogicVersion();
             }
             int major = Integer.parseInt(versionString.replaceAll("([^.]+)\\..*", "$1"));
+            if (major > 9) {
+                return true;
+            }
+            if (major < 9) {
+                return false;
+            }
             boolean isNightly = versionString.matches("[^-]+-(\\d{4})(\\d{2})(\\d{2})");
 
             //Support any 9.0 version >= 9.0-5.
@@ -265,17 +271,24 @@ public class DataHubImpl implements DataHub {
             String alteredString = StringUtils.join(modifiedMinor, modifiedHotFixNum);
             int ver = Integer.parseInt(alteredString);
 
-            // Using same logic as release/5.5.0 MarkLogicVersion.java supportsDataHubFramework
-            if (isNightly) {
-                return true;
+            //ver >= 500 => 9.0-5 and above is supported
+            if (!isNightly && ver < 500) {
+                return false;
             }
-
-            // System.out.println("Major: " + major + " Minor: " + minor + " HotFix: " + hotFixNum + " Ver: " + ver);
-            return major > 9 || (major == 9 && ver >= 50);
+            if (isNightly) {
+                String dateString = versionString.replaceAll("[^-]+-(\\d{4})(\\d{2})(\\d{2})", "$1-$2-$3");
+                //Support all 9.0-nightly on or after 5/5/2018
+                Date minDate = new GregorianCalendar(2018, Calendar.MAY, 5).getTime();
+                Date date = new SimpleDateFormat("y-M-d").parse(dateString);
+                if (date.before(minDate)) {
+                    return false;
+                }
+            }
 
         } catch (Exception e) {
             throw new ServerValidationException(e.toString());
         }
+        return true;
     }
 
     @Override

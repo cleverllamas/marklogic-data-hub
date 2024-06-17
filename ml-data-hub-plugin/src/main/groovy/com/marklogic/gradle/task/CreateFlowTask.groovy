@@ -76,4 +76,8 @@ abstract class CreateFlowTask extends HubTask {
         println "Creating an " + pluginFormat + " " + flowType + " flow named " + flowName + " for entity " + entityName + withMapping
         scaffolding.createFlow(entityName, flowName, flowType, pluginFormat, dataFormat, useES, mappingName)
     }
+
+    Boolean getUseES() {
+        return useES
+    }
 }
