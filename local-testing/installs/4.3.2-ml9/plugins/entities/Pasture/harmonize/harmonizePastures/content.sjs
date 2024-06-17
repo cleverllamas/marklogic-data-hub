@@ -8,22 +8,22 @@
 *
 * @return - your content
 */
-function createContent(id, rawContent, options) {
-  
+function createContent(id, options) {
+  let doc = cts.doc(id);
 
   let source;
 
   // for xml we need to use xpath
-  if(rawContent && xdmp.nodeKind(rawContent) === 'element' && rawContent instanceof XMLDocument) {
-    source = rawContent
+  if(doc && xdmp.nodeKind(doc) === 'element' && doc instanceof XMLDocument) {
+    source = doc
   }
   // for json we need to return the instance
-  else if(rawContent && rawContent instanceof Document) {
-    source = fn.head(rawContent.root);
+  else if(doc && doc instanceof Document) {
+    source = fn.head(doc.root);
   }
   // for everything else
   else {
-    source = rawContent;
+    source = doc;
   }
 
   return extractInstancePasture(source);
@@ -37,29 +37,34 @@ function createContent(id, rawContent, options) {
 *   metadata about the instance.
 */
 function extractInstancePasture(source) {
+  // the original source documents
   let attachments = source;
-  // now check to see if we have XML or json, then create a node clone to operate of off
+  // now check to see if we have XML or json, then create a node clone from the root of the instance
   if (source instanceof Element || source instanceof ObjectNode) {
-    let instancePath = '/';
+    let instancePath = '/*:envelope/*:instance';
     if(source instanceof Element) {
       //make sure we grab content root only
-      instancePath = '/node()[not(. instance of processing-instruction() or . instance of comment())]';
+      instancePath += '/node()[not(. instance of processing-instruction() or . instance of comment())]';
     }
     source = new NodeBuilder().addNode(fn.head(source.xpath(instancePath))).toNode();
   }
   else{
     source = new NodeBuilder().addNode(fn.head(source)).toNode();
   }
-  
+  // let id = !fn.empty(fn.head(source.xpath('//id'))) ? xs.int(fn.head(fn.head(source.xpath('//id')))) : null;
+  // let name = !fn.empty(fn.head(source.xpath('//name'))) ? xs.string(fn.head(fn.head(source.xpath('//name')))) : null;
+
 
   // return the instance object
-  return source
-  // {
-  //   '$attachments': attachments,
-  //   '$type': 'Pasture',
-  //   '$version': '0.0.1',
-
-  // }
+  return {
+    '$attachments': attachments,
+    '$type': 'Pasture',
+    '$version': '0.0.1',
+    'id': fn.head(source.xpath('//properties/id')),
+    'name': fn.head(source.xpath('//properties/name')),
+    'type': fn.head(source.xpath('//properties/type')),
+    'farm': fn.head(source.xpath('//properties/farm'))
+  }
 };
 
 

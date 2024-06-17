@@ -38,26 +38,27 @@ function createContent(id, rawContent, options) {
 */
 function extractInstanceFarm(source) {
   let attachments = source;
-  // now check to see if we have XML or json, then create a node clone to operate of off
-  if (source instanceof Element || source instanceof ObjectNode) {
-    let instancePath = '/';
-    if(source instanceof Element) {
-      //make sure we grab content root only
-      instancePath = '/node()[not(. instance of processing-instruction() or . instance of comment())]';
-    }
-    source = new NodeBuilder().addNode(fn.head(source.xpath(instancePath))).toNode();
-  }
-  else{
-    source = new NodeBuilder().addNode(fn.head(source)).toNode();
-  }
+  // // now check to see if we have XML or json, then create a node clone to operate of off
+  // if (source instanceof Element || source instanceof ObjectNode) {
+  //   let instancePath = '/';
+  //   if(source instanceof Element) {
+  //     //make sure we grab content root only
+  //     instancePath = '/node()[not(. instance of processing-instruction() or . instance of comment())]';
+  //   }
+  //   source = new NodeBuilder().addNode(fn.head(source.xpath(instancePath))).toNode();
+  // }
+  // else{
+  //   source = new NodeBuilder().addNode(fn.head(source)).toNode();
+  // }
   
 
-  // return the instance object
-  return {
-    '$attachments': attachments,
-    '$type': 'Farm',
-    '$version': '0.0.1'
-  }
+  // // return the instance object
+  // return {
+  //   '$attachments': attachments,
+  //   '$type': 'Farm',
+  //   '$version': '0.0.1'
+  // }
+  return attachments;
 };
 
 
