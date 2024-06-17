@@ -11,7 +11,7 @@
       "sourcedFrom" : "id"
     },
     "name" : {
-      "sourcedFrom" : "name"
+      "sourcedFrom" : "farmName"
     }
   }
 }

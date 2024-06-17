@@ -93,9 +93,8 @@ came from.
 In this section, we create and run an input flow for each entity: **Farm**, **Pasture**, and **Llama**. Each input flow performs the following:
 
 * Load data from the sample data directory.
-* Interpret the input data as delimited text (CSV), where each row is considered a _document_.
-* Automatically generate a unique URI to identify the wrapped document as it is added to the staging server. This prevents one document from overwriting another
-if multiple rows contain the same value in the first field.
+<!-- * Interpret the input data as delimited text (CSV), where each row is considered a _document_. -->
+* Automatically generate a unique URI to identify the wrapped document as it is added to the staging server.
 
 Before we can create the input flows, we need to deploy the entities:
 
@@ -116,6 +115,8 @@ mlcp import \
     -transform_module "/data-hub/4/transforms/mlcp-flow-transform.sjs" \
     -transform_param "entity-name=Farm,flow-name=loadFarms,jobId=cl-farms" \
     -input_file_path "data/farms" \
+    -output_uri_replace "data,''" \
+    -output_collections "Farm" \
     -input_file_type "json" \
     -host "localhost" \
     -port "8010"
@@ -134,6 +135,8 @@ mlcp import \
     -transform_module "/data-hub/4/transforms/mlcp-flow-transform.sjs" \
     -transform_param "entity-name=Pasture,flow-name=loadPastures,jobId=cl-pastures" \
     -input_file_path "data/pastures" \
+    -output_uri_replace "data,''" \
+    -output_collections "Pasture" \
     -input_file_type "json" \
     -host "localhost" \
     -port "8010"
@@ -152,6 +155,8 @@ mlcp import \
     -transform_module "/data-hub/4/transforms/mlcp-flow-transform.sjs" \
     -transform_param "entity-name=Llama,flow-name=loadLlamas,jobId=cl-llamas" \
     -input_file_path "data/llamas" \
+    -output_uri_replace "data,''" \
+    -output_collections "Llama" \
     -input_file_type "json" \
     -host "localhost" \
     -port "8010"
@@ -182,13 +187,13 @@ In this section, we will:
 * Create and Run the Harmonize Flow.
 
 ### Define the Entity Model
-We first define the entity model, which specifies the standard labels for the fields we want to harmonize. For the **Farm** dataset, we will harmonize two fields:
-`id` and `name`. Therefore, we must add those fields as properties to our **Farm** entity model.
+We first define the entity model, which specifies the standard labels for the fields we want to harmonize. For the **Farm** dataset, we will harmonize two
+fields: `id` and `name`. Therefore, we must add those fields as properties to our **Farm** entity model.
 
 | Name | Type | Other settings | Notes |
 | --- | --- | --- | --- |
-| sku | string | key | Used as the primary key because the SKU is unique for each product. |
-| price | decimal | | Set as a decimal because we need to perform calculations with the price.|
+| id | int | key | Used as the primary key because it is unique for each farm. |
+| name | string | | |
 
 To define the **Farm** entity model:
 ````json
@@ -228,7 +233,7 @@ For the **Farm** entity, we define the following simple mappings:
 | id (string) | id (int) | Difference in types |
 | farmName (string) | name (string) | Difference between field names |
 
-To create a mapping named `FarmMapping` at `plugins/mappings/FarmMapping/FarmMapping.mapping.json`:
+To create a mapping named `FarmMapping` at `plugins/mappings/FarmMapping/FarmMapping-1.mapping.json`:
 
 ````json
 {
@@ -244,7 +249,7 @@ To create a mapping named `FarmMapping` at `plugins/mappings/FarmMapping/FarmMap
       "sourcedFrom" : "id"
     },
     "name" : {
-      "sourcedFrom" : "name"
+      "sourcedFrom" : "farmName"
     }
   }
 }
@@ -260,16 +265,115 @@ Harmonization uses the data in your **STAGING** database to generate canonical e
 
 To create a harmonization flow for the **Farm** entity:
 ````bash
-./gradlew hubCreateHarmonizeFlow -PentityName=Farm -PflowName=harmonizeFarms -PdataFormat=json -PpluginFormat=sjs -PmappingName=FarmMapping
+./gradlew hubCreateHarmonizeFlow -PentityName=Farm -PflowName=harmonizeFarms -PdataFormat=json -PpluginFormat=sjs -PmappingName=FarmMapping-1
 ````
 
 When you create a flow with mapping, gradle automatically generates harmonization code based on the entity model and the mapping, we then need to deploy the
 code to MarkLogic Server:
 ````bash
-./gradlew hubDeployUserArtifacts
+./gradlew mlRedeploy
 ````
 
 Now we can run the harmonization flow:
 ````bash
 ./gradlew hubRunFlow -PentityName=Farm -PflowName=harmonizeFarms
 ````
+
+## Harmonize the Pasture Data by Custom Code
+<!-- Harmonization of the **Pasture** entity is more complex.
+
+* Calculate size based on the area.
+
+Therefore, we must use DHF code scaffolding to generate the harmonization code and then customize it.
+
+We have already loaded the **Pasture** raw data by:
+
+* creating the **Pasture** entity and
+* creating and running the associated input flow.
+
+In this section, we will:
+
+* Define the entity model by adding properties to the entity model.
+* Create the Harmonize flow.
+* Customize the Harmonize flow, specifically the Collector code and the Content code.
+* Run the Harmonize Flow.
+* View the results.
+
+### Define the Entity Model
+dWe assume the following about the **Pasture** data:
+
+* Each llama is identified by its id.
+* Each pasture can have more than one llama.
+* Each pasture includes a size, which must be calculated.
+
+Based on these assumptions, we will add the following properties to the **Pasture** entity model for harmonization:
+
+| Name | Type | Other settings | Notes |
+| --- | --- | --- | --- |
+| id | int | key | Used as the primary key because order ID is unique for each order. Needs an element range index. |
+| name | string |  | |
+| size | decimal | | The calculated size of the pasture. |
+| llamas | **Llama** entity | Cardinality: 1..∞ | An array of pointers to the **Llama** entities in our FINAL database. |
+
+To define the Order entity model:
+````json
+{
+  "info" : {
+    "title" : "Pasture",
+    "version" : "0.0.1",
+    "baseUri" : "http://example.com/",
+    "description" : "An Pasture entity"
+  },
+  "definitions" : {
+    "Farm" : {
+      "description" : "The Pasture entity root.",
+      "required" : [ ],
+      "rangeIndex" : [ ],
+      "elementRangeIndex" : [ ],
+      "wordLexicon" : [ ],
+      "pii" : [ ],
+      "properties" : {
+        "id": {
+          "datatype": "int"
+        },
+        "name": {
+          "datatype": "string"
+        },
+        "type": {
+          "datatype": "string"
+        },
+        "farm": {
+          "datatype": "int"
+        }
+      }
+    }
+  }
+}
+````
+
+### Create the Harmonize Flow
+Harmonization uses the data in your **STAGING** database to generate canonical entity instances in the **FINAL** database.
+
+To create a harmonization flow for the **Pasture** entity:
+````bash
+./gradlew hubCreateHarmonizeFlow -PentityName=Pasture -PflowName=harmonizePastures -PdataFormat=json -PpluginFormat=sjs
+````
+Because we did not specify a mapping, DHF creates boilerplate code based on the entity model. This code includes default initialization for the entity
+properties, which we will customize.
+
+### Customize the Harmonize Flow
+
+#### Customizing the Collector Plugin
+The **Collector** plugin generates a list of IDs for the flow to operate on. The IDs can be whatever your application needs (e.g., URIs, relational row IDs,
+twitter handles). The default **Collector** plugin produces a list of source document URIs.
+
+An options parameter is passed to the **Collector** plugin, and it contains the following properties:
+
+* entity: the name of the entity this plugin belongs to (e.g., “Pasture”)
+* flow: the name of the flow this plugin belongs to (e.g., “harmonizePastures”)
+* flowType: the type of flow being run (“input” or “harmonize”; e.g., “harmonize”)
+
+The `loadPastures` input flow automatically groups the source documents into a collection named **Pasture**. The default **Collector** plugin uses that
+collection to derive a list of URIs.
+
+ -->
