@@ -9,7 +9,7 @@
 * @return - your content
 */
 function createContent(id, rawContent, options) {
-  
+
 
   let source;
 
@@ -28,7 +28,7 @@ function createContent(id, rawContent, options) {
 
   return extractInstanceLlama(source);
 }
-  
+
 /**
 * Creates an object instance from some source document.
 * @param source  A document or node that contains
@@ -50,14 +50,9 @@ function extractInstanceLlama(source) {
   else{
     source = new NodeBuilder().addNode(fn.head(source)).toNode();
   }
-  
 
   // return the instance object
-  return {
-    '$attachments': attachments,
-    '$type': 'Llama',
-    '$version': '0.0.1'
-  }
+  return source;
 };
 
 

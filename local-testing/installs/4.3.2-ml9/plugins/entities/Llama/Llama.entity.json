@@ -12,8 +12,21 @@
       "rangeIndex" : [ ],
       "elementRangeIndex" : [ ],
       "wordLexicon" : [ ],
-      "pii" : [ ],
-      "properties" : { }
+      "pii" : [ "birthDate" ],
+      "properties" : {
+        "id": {
+          "datatype": "int"
+        },
+        "name": {
+          "datatype": "string"
+        },
+        "birthDate": {
+          "datatype": "date"
+        },
+        "pasture": {
+          "datatype": "int"
+        }
+      }
     }
   }
 }

@@ -9,7 +9,7 @@
 * @return - your content
 */
 function createContent(id, rawContent, options) {
-  
+
 
   let source;
 
@@ -50,16 +50,10 @@ function extractInstancePasture(source) {
   else{
     source = new NodeBuilder().addNode(fn.head(source)).toNode();
   }
-  
+
 
   // return the instance object
-  return source
-  // {
-  //   '$attachments': attachments,
-  //   '$type': 'Pasture',
-  //   '$version': '0.0.1',
-
-  // }
+  return source;
 };
 
 

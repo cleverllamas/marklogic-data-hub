@@ -9,7 +9,7 @@
 * @return - your content
 */
 function createContent(id, rawContent, options) {
-  
+
 
   let source;
 
@@ -28,7 +28,7 @@ function createContent(id, rawContent, options) {
 
   return extractInstanceFarm(source);
 }
-  
+
 /**
 * Creates an object instance from some source document.
 * @param source  A document or node that contains
@@ -37,28 +37,7 @@ function createContent(id, rawContent, options) {
 *   metadata about the instance.
 */
 function extractInstanceFarm(source) {
-  let attachments = source;
-  // // now check to see if we have XML or json, then create a node clone to operate of off
-  // if (source instanceof Element || source instanceof ObjectNode) {
-  //   let instancePath = '/';
-  //   if(source instanceof Element) {
-  //     //make sure we grab content root only
-  //     instancePath = '/node()[not(. instance of processing-instruction() or . instance of comment())]';
-  //   }
-  //   source = new NodeBuilder().addNode(fn.head(source.xpath(instancePath))).toNode();
-  // }
-  // else{
-  //   source = new NodeBuilder().addNode(fn.head(source)).toNode();
-  // }
-  
-
-  // // return the instance object
-  // return {
-  //   '$attachments': attachments,
-  //   '$type': 'Farm',
-  //   '$version': '0.0.1'
-  // }
-  return attachments;
+  return source;
 };
 
 
