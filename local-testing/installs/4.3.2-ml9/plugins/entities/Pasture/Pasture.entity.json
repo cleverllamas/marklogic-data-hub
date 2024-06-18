@@ -13,7 +13,20 @@
       "elementRangeIndex" : [ ],
       "wordLexicon" : [ ],
       "pii" : [ ],
-      "properties" : { }
+      "properties" : {
+        "id": {
+          "datatype": "int"
+        },
+        "name": {
+          "datatype": "string"
+        },
+        "type": {
+          "datatype": "string"
+        },
+        "farm": {
+          "datatype": "int"
+        }
+      }
     }
   }
 }
