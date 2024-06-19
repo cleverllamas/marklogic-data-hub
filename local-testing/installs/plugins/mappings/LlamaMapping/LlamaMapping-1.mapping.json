@@ -11,7 +11,7 @@
       "sourcedFrom" : "id"
     },
     "name" : {
-      "sourcedFrom" : "farmName"
+      "sourcedFrom" : "name"
     },
     "birthDate" : {
       "sourcedFrom" : "birthDate"

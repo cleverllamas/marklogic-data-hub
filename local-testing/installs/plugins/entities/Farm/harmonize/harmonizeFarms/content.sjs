@@ -28,7 +28,7 @@ function createContent(id, options) {
 
   return extractInstanceFarm(source);
 }
-  
+
 /**
 * Creates an object instance from some source document.
 * @param source  A document or node that contains
@@ -51,9 +51,9 @@ function extractInstanceFarm(source) {
   else{
     source = new NodeBuilder().addNode(fn.head(source)).toNode();
   }
-  /* These mappings were generated using mapping: FarmMapping, version: 1 on 2024-06-17T12:42:09.7712616+02:00.*/
+  /* These mappings were generated using mapping: FarmMapping, version: 1 on 2024-06-19T16:16:33.6451516+02:00.*/
   let id = !fn.empty(fn.head(source.xpath('//id'))) ? xs.int(fn.head(fn.head(source.xpath('//id')))) : null;
-  let name = !fn.empty(fn.head(source.xpath('//name'))) ? xs.string(fn.head(fn.head(source.xpath('//name')))) : null;
+  let name = !fn.empty(fn.head(source.xpath('//farmName'))) ? xs.string(fn.head(fn.head(source.xpath('//farmName')))) : null;
 
   // return the instance object
   return {

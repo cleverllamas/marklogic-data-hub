@@ -271,7 +271,7 @@ To create a harmonization flow for the **Farm** entity:
 When you create a flow with mapping, gradle automatically generates harmonization code based on the entity model and the mapping, we then need to deploy the
 code to MarkLogic Server:
 ````bash
-./gradlew mlRedeploy
+./gradlew mlReloadModules
 ````
 
 Now we can run the harmonization flow:
@@ -327,7 +327,15 @@ To create a harmonization flow for the **Pasture** entity:
 ./gradlew hubCreateHarmonizeFlow -PentityName=Pasture -PflowName=harmonizePastures -PdataFormat=json -PpluginFormat=sjs
 ````
 
-<!-- MORE TO BE ADDED -->
+After creating a harmonization stub the code needs to be altered, we then need to deploy the code to MarkLogic Server:
+````bash
+./gradlew mlReloadModules
+````
+
+Now we can run the harmonization flow:
+````bash
+./gradlew hubRunFlow -PentityName=Pasture -PflowName=harmonizePastures
+````
 
 ## Securing Personally Identifiable Information
 Securing personally identifiable information (PII) was introduced in DHF v4.0.0. To protect PII, the PII fields must be identified in the entity model.
@@ -434,6 +442,12 @@ code to MarkLogic Server:
 Now we can run the harmonization flow:
 ````bash
 ./gradlew hubRunFlow -PentityName=Llama -PflowName=harmonizeLlamas
+````
+
+### Generate the PII Configuration Files
+To generate the PII security configuration files:
+````bash
+./gradlew hubGeneratePii
 ````
 
 ### Deploy the Configuration Files
