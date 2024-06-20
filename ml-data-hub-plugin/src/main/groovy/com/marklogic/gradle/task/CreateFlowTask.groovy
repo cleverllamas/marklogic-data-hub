@@ -24,10 +24,12 @@ import com.marklogic.hub.flow.DataFormat
 import com.marklogic.hub.flow.FlowType
 import com.marklogic.hub.scaffold.Scaffolding
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 
 abstract class CreateFlowTask extends HubTask {
 
     @Input
+    @Optional
     public Boolean useES
 
 
