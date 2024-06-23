@@ -51,7 +51,7 @@ function extractInstanceFooBar(source) {
   else{
     source = new NodeBuilder().addNode(fn.head(source)).toNode();
   }
-  /* These mappings were generated using mapping: FooBarMapping, version: 1 on 2024-06-20T00:30:05.3774849+02:00.*/
+  /* These mappings were generated using mapping: FooBar, version: 1 on 2024-06-22T14:31:02.622308Z.*/
   let id = !fn.empty(fn.head(source.xpath('//id'))) ? xs.int(fn.head(fn.head(source.xpath('//id')))) : null;
   let name = !fn.empty(fn.head(source.xpath('//name'))) ? xs.string(fn.head(fn.head(source.xpath('//name')))) : null;
 

@@ -1,5 +1,5 @@
 {
-  "path-expression" : "/envelope//instance//FooBar/name",
+  "path-expression" : "/envelope//instance//Llama/birthDate",
   "path-namespace" : [ ],
   "permission" : {
     "role-name" : "pii-reader",
