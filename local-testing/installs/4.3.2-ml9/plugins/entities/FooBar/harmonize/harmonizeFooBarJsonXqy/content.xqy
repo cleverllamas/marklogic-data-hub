@@ -48,7 +48,7 @@ $source as node()?
       $source/instance
     else
       $source
-  (: These mappings were generated using mapping: FooBarMapping, version: 1 on 2024-06-20T00:29:59.2047952+02:00. :)
+  (: These mappings were generated using mapping: FooBar, version: 1 on 2024-06-22T14:30:50.959832Z. :)
   let $id := xs:int($source//id)
   let $name := xs:string($source//name)
 

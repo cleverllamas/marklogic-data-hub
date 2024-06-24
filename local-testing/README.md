@@ -14,7 +14,7 @@ Uses `hubPreinstallCheck` to deploy your DHF project.
 Extends ml-gradle's WatchTask by ensuring that modules in DHF-specific folders (`plugins` and `entity-config`) are monitored.
 | MarkLogic | DHF | Result | Notes |
 | --- | --- | --- | --- |
-| ML 9 | 4.3.2 | - | |
+| ML 9 | 4.3.2 | FAIL | Changes to flows (`plugins` folder) or search options (`entity-config` folder) don't get deployed while running `mlWatch` |
 | ML 11 | 4.3.3 | - | |
 
 #### mlUpdateIndexes
@@ -28,8 +28,8 @@ Updates the properties of every database without creating or updating forests. M
 Updates your DHF instance to a newer version. At your project's root folder, run the `hubUpdate -i` Gradle task.
 | MarkLogic | DHF | Result | Notes |
 | --- | --- | --- | --- |
-| ML 9 | 4.3.2 | - | |
-| ML 11 | 4.3.3 | - | |
+| ML 9 | 4.3.2 | SKIP | This will be excluded. |
+| ML 11 | 4.3.3 | SKIP | This will be excluded. |
 
 #### hubInfo
 Prints out basic info about the DHF configuration.
@@ -79,7 +79,7 @@ Installs user artifacts, such as entities and mappings, to the MarkLogic server.
 Initializes the current directory as a DHF project.
 | MarkLogic | DHF | Result | Notes |
 | --- | --- | --- | --- |
-| ML 9 | 4.3.2 | PASS | Initially run by David |
+| ML 9 | 4.3.2 | PASS | This task will be validated and might get excluded. |
 | ML 11 | 4.3.3 | - | |
 
 #### hubCreateEntity
@@ -119,7 +119,20 @@ Then changed to:
 }
 ````
 
-Mapping added:
+
+| MarkLogic | DHF | Result | Notes |
+| --- | --- | --- | --- |
+| ML 9 | 4.3.2 | PASS | |
+| ML 11 | 4.3.3 | - | |
+
+#### hubCreateMapping
+Creates a boilerplate mapping.
+
+````
+gradlew hubCreateMapping -PmappingName=Foo
+````
+
+Then changed to:
 ````json
 {
   "language" : "zxx",
@@ -173,6 +186,30 @@ gradlew hubCreateHarmonizeFlow -PentityName=FooBar -PflowName=harmonizeFooBarXml
 | MarkLogic | DHF | Result | Notes |
 | --- | --- | --- | --- |
 | ML 9 | 4.3.2 | PASS | Tested all combination Json/Sjs, Json/Xqy, Xml/Sjs, Xml/Xqy |
+| ML 11 | 4.3.3 | - | |
+
+#### hubGenerateTDETemplates
+Generates TDE Templates from the entity definition files. It is possible to only generate TDE templates for specific entities by setting the (comma separated)
+project property 'entityNames'. E.g. -PentityNames=Entity1,Entity2
+
+````
+gradlew hubGenerateTDETemplates -PentityNames=FooBar
+````
+
+| MarkLogic | DHF | Result | Notes |
+| --- | --- | --- | --- |
+| ML 9 | 4.3.2 | PASS | |
+| ML 11 | 4.3.3 | - | |
+
+#### hubSaveIndexes
+Saves the indexes defined in {entity-name}.entity.json file to staging and final entity config in src/main/entity-config/databases directory
+
+````
+gradlew hubSaveIndexes
+````
+| MarkLogic | DHF | Result | Notes |
+| --- | --- | --- | --- |
+| ML 9 | 4.3.2 | PASS | |
 | ML 11 | 4.3.3 | - | |
 
 #### hubGeneratePii
@@ -272,3 +309,27 @@ Removes all components of your data hub from the MarkLogic server, including dat
 | --- | --- | --- | --- |
 | ML 9 | 4.3.2 | PASS | |
 | ML 11 | 4.3.3 | - | |
+
+
+<!--
+MarkLogic Data Hub Scaffolding tasks
+------------------------------------
+hubGenerateTDETemplates - Generates TDE Templates from the entity definition files. It is possible to only generate TDE templates for specific entities by setting the (comma separated) project property 'entityNames'. E.g. -PentityNames=Entity1,Entity2
+hubInit
+hubSaveIndexes - Saves the indexes defined in {entity-name}.entity.json file to staging and final entity config in src/main/entity-config/databases directory
+
+MarkLogic Data Hub Setup tasks
+------------------------------
+hubDeleteModuleTimestampsFile
+hubDeployUserArtifacts - Installs user artifacts such as entities and mappings.
+hubDeployUserModules - Installs user modules from the plugins and src/main/entity-config directories.
+hubDisableDebugging - Disables debugging on the running DHF server. Requires data-hub-admin-role or equivalent.
+hubDisableTracing - Disables tracing on the running DHF server. Requires data-hub-admin-role or equivalent.
+hubEnableDebugging - Enables debugging on the running DHF server. Requires data-hub-admin-role or equivalent.
+hubEnableTracing - Enables tracing on the running DHF server. Requires data-hub-admin-role or equivalent.
+hubInfo
+hubInstallModules - Installs DHF internal modules.  Requires data-hub-admin-role or equivalent.
+hubPreInstallCheck - Ascertains whether a MarkLogic server can accept installation of the DHF.  Requires administrative privileges to the server.
+hubUpdate
+-->
+
