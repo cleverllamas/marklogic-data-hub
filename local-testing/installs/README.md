@@ -271,7 +271,7 @@ To create a harmonization flow for the **Farm** entity:
 When you create a flow with mapping, gradle automatically generates harmonization code based on the entity model and the mapping, we then need to deploy the
 code to MarkLogic Server:
 ````bash
-./gradlew mlRedeploy
+./gradlew mlReloadModules
 ````
 
 Now we can run the harmonization flow:
@@ -280,42 +280,10 @@ Now we can run the harmonization flow:
 ````
 
 ## Harmonize the Pasture Data by Custom Code
-<!-- Harmonization of the **Pasture** entity is more complex.
-
-* Calculate size based on the area.
-
-Therefore, we must use DHF code scaffolding to generate the harmonization code and then customize it.
-
-We have already loaded the **Pasture** raw data by:
-
-* creating the **Pasture** entity and
-* creating and running the associated input flow.
-
-In this section, we will:
-
-* Define the entity model by adding properties to the entity model.
-* Create the Harmonize flow.
-* Customize the Harmonize flow, specifically the Collector code and the Content code.
-* Run the Harmonize Flow.
-* View the results.
+Harmonization of the **Pasture** entity is is done using custom code.
 
 ### Define the Entity Model
-dWe assume the following about the **Pasture** data:
-
-* Each llama is identified by its id.
-* Each pasture can have more than one llama.
-* Each pasture includes a size, which must be calculated.
-
-Based on these assumptions, we will add the following properties to the **Pasture** entity model for harmonization:
-
-| Name | Type | Other settings | Notes |
-| --- | --- | --- | --- |
-| id | int | key | Used as the primary key because order ID is unique for each order. Needs an element range index. |
-| name | string |  | |
-| size | decimal | | The calculated size of the pasture. |
-| llamas | **Llama** entity | Cardinality: 1..∞ | An array of pointers to the **Llama** entities in our FINAL database. |
-
-To define the Order entity model:
+To define the **Pasture** entity model:
 ````json
 {
   "info" : {
@@ -325,7 +293,7 @@ To define the Order entity model:
     "description" : "An Pasture entity"
   },
   "definitions" : {
-    "Farm" : {
+    "Pasture" : {
       "description" : "The Pasture entity root.",
       "required" : [ ],
       "rangeIndex" : [ ],
@@ -358,22 +326,141 @@ To create a harmonization flow for the **Pasture** entity:
 ````bash
 ./gradlew hubCreateHarmonizeFlow -PentityName=Pasture -PflowName=harmonizePastures -PdataFormat=json -PpluginFormat=sjs
 ````
-Because we did not specify a mapping, DHF creates boilerplate code based on the entity model. This code includes default initialization for the entity
-properties, which we will customize.
 
-### Customize the Harmonize Flow
+After creating a harmonization stub the code needs to be altered, we then need to deploy the code to MarkLogic Server:
+````bash
+./gradlew mlReloadModules
+````
 
-#### Customizing the Collector Plugin
-The **Collector** plugin generates a list of IDs for the flow to operate on. The IDs can be whatever your application needs (e.g., URIs, relational row IDs,
-twitter handles). The default **Collector** plugin produces a list of source document URIs.
+Now we can run the harmonization flow:
+````bash
+./gradlew hubRunFlow -PentityName=Pasture -PflowName=harmonizePastures
+````
 
-An options parameter is passed to the **Collector** plugin, and it contains the following properties:
+## Securing Personally Identifiable Information
+Securing personally identifiable information (PII) was introduced in DHF v4.0.0. To protect PII, the PII fields must be identified in the entity model.
 
-* entity: the name of the entity this plugin belongs to (e.g., “Pasture”)
-* flow: the name of the flow this plugin belongs to (e.g., “harmonizePastures”)
-* flowType: the type of flow being run (“input” or “harmonize”; e.g., “harmonize”)
+We have already loaded the **Llama** raw data by:
 
-The `loadPastures` input flow automatically groups the source documents into a collection named **Pasture**. The default **Collector** plugin uses that
-collection to derive a list of URIs.
+* creating the **Llama** entity and
+* creating and running the associated input flow.
 
- -->
+In this section, we will:
+
+* Define the entity model by adding properties to the entity model.
+* Define the source-to-entity mapping to specify which field in the dataset corresponds to the properties in the entity model.
+* Create and run the Harmonize Flow.
+* Deploy the configuration files.
+
+### Define the Entity Model
+Make the following changes to the **Llama** entity:
+
+````json
+{
+  "info" : {
+    "title" : "Llama",
+    "version" : "0.0.1",
+    "baseUri" : "http://example.com/",
+    "description" : "An Llama entity"
+  },
+  "definitions" : {
+    "Llama" : {
+      "description" : "The Llama entity root.",
+      "required" : [ ],
+      "rangeIndex" : [ ],
+      "elementRangeIndex" : [ ],
+      "wordLexicon" : [ ],
+      "pii" : [ "birthDate" ],
+      "properties" : {
+        "id": {
+          "datatype": "int"
+        },
+        "name": {
+          "datatype": "string"
+        },
+        "birthDate": {
+          "datatype": "date"
+        },
+        "pasture": {
+          "datatype": "id"
+        }
+      }
+    }
+  }
+}
+````
+
+### Define the Mappings
+Create a mapping named `LlamaMapping` at `plugins/mappings/LlamaMapping/LlamaMapping-1.mapping.json`:
+
+````json
+{
+  "language" : "zxx",
+  "name" : "LlamaMapping",
+  "description" : "Mapping for Llama",
+  "version" : 1,
+  "targetEntityType" : "http://example.org/Llama-0.0.1/Llama",
+  "sourceContext" : "//",
+  "sourceURI" : "/llamas/1.json",
+  "properties" : {
+    "id" : {
+      "sourcedFrom" : "id"
+    },
+    "name" : {
+      "sourcedFrom" : "farmName"
+    },
+    "birthDate" : {
+      "sourcedFrom" : "birthDate"
+    },
+    "pasture" : {
+      "sourcedFrom" : "pasture"
+    }
+  }
+}
+
+````
+
+Before we can create the harmonization flow, we need to deploy the entity and mapping:
+````bash
+./gradlew hubDeployUserArtifacts
+````
+
+### Create and Run the Harmonize Flow
+Harmonization uses the data in your **STAGING** database to generate canonical entity instances in the **FINAL** database.
+
+To create a harmonization flow for the **Llama** entity:
+````bash
+./gradlew hubCreateHarmonizeFlow -PentityName=Llama -PflowName=harmonizeLlamas -PdataFormat=json -PpluginFormat=sjs -PmappingName=LlamaMapping-1
+````
+
+When you create a flow with mapping, gradle automatically generates harmonization code based on the entity model and the mapping, we then need to deploy the
+code to MarkLogic Server:
+````bash
+./gradlew mlReloadModules
+````
+
+Now we can run the harmonization flow:
+````bash
+./gradlew hubRunFlow -PentityName=Llama -PflowName=harmonizeLlamas
+````
+
+### Generate the PII Configuration Files
+To generate the PII security configuration files:
+````bash
+./gradlew hubGeneratePii
+````
+
+### Deploy the Configuration Files
+To deploy the PII security configuration files to the **FINAL** database,
+
+1. In the `gradle.properties` file, set `mlSecurityUsername` and `m`lSecurityPassword` to your MarkLogic Server credentials.
+
+**IMPORTANT: Your MarkLogic Server account must be assigned both `manage-admin` and `security` roles.**
+
+2. Open a command-line window, and navigate to your DHF project root directory.
+3. At your project’s root folder, run the `mlDeploySecurity` Gradle task.
+````bash
+./gradlew mlDeploySecurity
+````
+
+Only users with the `pii-reader` role will be able to view properties marked as PII in the documents they are allowed to view.
