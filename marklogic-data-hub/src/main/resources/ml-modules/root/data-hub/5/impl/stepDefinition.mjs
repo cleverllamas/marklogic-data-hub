@@ -18,6 +18,7 @@
 import httpUtils from "/data-hub/5/impl/http-utils.mjs";
 import hubUtils from "/data-hub/5/impl/hub-utils.mjs";
 import Perf from "/data-hub/5/impl/perf.mjs";
+import XqueryStepProxy from "xqueryStepProxy.mjs";
 
 const cachedModules = new Map();
 
@@ -72,7 +73,11 @@ export default class StepDefinition {
   retrieveModuleLibrary(moduleLibraryURI) {
     if (!cachedModules.has(moduleLibraryURI)) {
       let extension = moduleLibraryURI.split(".").pop();
-      if (extension === "mjs") {
+      if (extension === "xqy") {
+        xdmp.log("DAE-XQY")
+        return new XqueryStepProxy().setModuleLibraryURI(moduleLibraryURI).getFunctions()
+      }
+      else if (extension === "mjs") {
         cachedModules.set(moduleLibraryURI, hubUtils.requireMjsModule(moduleLibraryURI));
       } else {
         cachedModules.set(moduleLibraryURI, require(moduleLibraryURI));
@@ -80,6 +85,7 @@ export default class StepDefinition {
     }
     return cachedModules.get(moduleLibraryURI);
   }
+
 }
 
 

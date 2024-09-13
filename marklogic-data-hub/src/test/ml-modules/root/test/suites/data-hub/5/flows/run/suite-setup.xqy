@@ -43,6 +43,12 @@ xdmp:invoke-function(function() {
     test:get-test-file("valueStep.mjs"),
     (xdmp:default-permissions(), xdmp:permission("rest-extension-user", "execute"), xdmp:permission("data-hub-module-reader", "read"), xdmp:permission("data-hub-module-writer", "update")),
     ()
+  ),
+  xdmp:document-insert(
+    "/test/custom-by-value-step/main.xqy",
+    test:get-test-file("valueStep.xqy"),
+    (xdmp:default-permissions(), xdmp:permission("rest-extension-user", "execute"), xdmp:permission("data-hub-module-reader", "read"), xdmp:permission("data-hub-module-writer", "update")),
+    ()
   )
 },
   map:entry("database", xdmp:modules-database())

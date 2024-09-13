@@ -6,6 +6,9 @@ xdmp:invoke-function(function() {
   ),
     xdmp:document-delete(
     "/test/custom-by-value-step/main.mjs"
+  ),
+    xdmp:document-delete(
+    "/test/custom-by-value-step/main.xqy"
   )
 },
   map:entry("database", xdmp:modules-database())
