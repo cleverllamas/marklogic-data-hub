@@ -37,11 +37,12 @@ declare function custom:main(
   let $envelope := custom:make-envelope($instance, $headers, $triples, $output-format)
 
   let $content := $content => map:with("uri", "/processed/customer1-xquery.json")
+  => map:with("value", $envelope)
    =>map:with("context", map:map()
-      =>map:with("collections",  ("test-data")),
+      =>map:with("collections",  ("test-data"))
    )
 
-  return $envelope
+  return $content 
 };
 
 (:~
@@ -123,10 +124,8 @@ declare function custom:make-envelope($content as item()?, $headers, $triples, $
                 let $_ := map:put($c,"whitespace" , "ignore" )
                 return
                   json:transform-from-json(map:get($content, "$attachments"),$c)
-            else context: {
-      collections: ["test-data"],
-      permissions: hubUtils.parsePermissions("data-hub-operator,read,data-hub-operator,update")
-              ()
+            else
+            ()
           }
         </attachments>
       </envelope>

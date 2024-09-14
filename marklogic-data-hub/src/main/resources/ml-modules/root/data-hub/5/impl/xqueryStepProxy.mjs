@@ -39,16 +39,12 @@ export default class XqueryStepProxy {
     xdmp.log(["DAE3", this.moduleLibraryURI, content, options, context])
     var proxyContent  = xdmp.fromJSON(content)
     var proxyOptions  = xdmp.fromJSON(options)
-
-
-
-
-
-
-                  var targetModule = require(this.moduleLibraryURI)
+    var targetModule = require(this.moduleLibraryURI)
     var modifiedContent = targetModule[functionName](proxyContent, proxyOptions)
     xdmp.log(["DAE - modifiedcontent", modifiedContent])
-    return modifiedContent
+    content.uri = modifiedContent.uri
+    content.value = modifiedContent.value
+    return content
   }
 }
 
