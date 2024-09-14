@@ -18,10 +18,9 @@ declare function custom:main(
   $options as map:map
 ){
 
-  let $_ := xdmp:log(("DAE - in Main", "-", $content, "--", $options, "--", $context))
+  let $_ := xdmp:log(("DAE - in Main", "-", $content, "--", $options, "--"))
 
-  (: get the source doc :)
-  let $doc := if (xdmp:node-kind($content/value) eq "text") then xdmp:unquote($content/value) else $content/value
+  let $doc := $content=>map:get("value")
 
   (: get the headers :)
   let $headers := custom:create-headers($doc, $options)
@@ -36,6 +35,11 @@ declare function custom:main(
 
   (: get the envelope :)
   let $envelope := custom:make-envelope($instance, $headers, $triples, $output-format)
+
+  let $content := $content => map:with("uri", "/processed/customer1-xquery.json")
+   =>map:with("context", map:map()
+      =>map:with("collections",  ("test-data")),
+   )
 
   return $envelope
 };
@@ -119,7 +123,9 @@ declare function custom:make-envelope($content as item()?, $headers, $triples, $
                 let $_ := map:put($c,"whitespace" , "ignore" )
                 return
                   json:transform-from-json(map:get($content, "$attachments"),$c)
-            else
+            else context: {
+      collections: ["test-data"],
+      permissions: hubUtils.parsePermissions("data-hub-operator,read,data-hub-operator,update")
               ()
           }
         </attachments>
