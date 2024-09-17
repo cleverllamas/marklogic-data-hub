@@ -44,6 +44,10 @@ export default class XqueryStepProxy {
     xdmp.log(["DAE - modifiedcontent", modifiedContent])
     content.uri = modifiedContent.uri
     content.value = modifiedContent.value
+    content.context = {... content.context}
+    content.context.collections  = new Sequence(Array.isArray(modifiedContent.context.collections) ? new Sequence(... modifiedContent.context.collections) : modifiedContent.context.collections).toArray()
+    content.context.metadata  = modifiedContent.context.metadata ? { ... options.metadata, ... modifiedContent.context.metadata} : options.metadaata
+    content.context.permissions  = new Sequence(Array.isArray(modifiedContent.context.permissions) ? new Sequence(... modifiedContent.context.permissions) : modifiedContent.context.permissions).toArray()
     return content
   }
 }

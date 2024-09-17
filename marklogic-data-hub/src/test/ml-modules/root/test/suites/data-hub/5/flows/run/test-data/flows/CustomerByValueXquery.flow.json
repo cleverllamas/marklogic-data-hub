@@ -4,6 +4,7 @@
     "collections": [
       "CustomerByValue"
     ],
+    "metadata" : {"key1" : 1},
     "targetEntity": "Customer",
     "sourceQuery": "cts.values(cts.uriReference())",
     "sourceQueryIsScript": true,

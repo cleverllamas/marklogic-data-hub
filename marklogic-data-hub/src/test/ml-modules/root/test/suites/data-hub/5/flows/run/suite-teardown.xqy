@@ -12,4 +12,12 @@ xdmp:invoke-function(function() {
   )
 },
   map:entry("database", xdmp:modules-database())
+);
+
+xdmp:invoke-function(function() {
+  xdmp:document-delete(
+    "/processed/customer1-xquery.json"
+  )
+},
+  map:entry("database", "data-hub-FINAL")
 )

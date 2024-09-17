@@ -36,11 +36,19 @@ declare function custom:main(
   (: get the envelope :)
   let $envelope := custom:make-envelope($instance, $headers, $triples, $output-format)
 
-  let $content := $content => map:with("uri", "/processed/customer1-xquery.json")
+  let $content := $content
+  => map:with("uri", "/processed/customer1-xquery.json")
   => map:with("value", $envelope)
    =>map:with("context", map:map()
-      =>map:with("collections",  ("test-data"))
+      =>map:with("collections",  ($options=>map:get("collections"),  "test-data-xqy"))
+      =>map:with("metadata",  ((map:entry("some-key", "some-value"))))
+      =>map:with("permissions",   (
+        $options=>map:get("permissions"),  
+        xdmp:permission("data-hub-operator","read"),
+        xdmp:permission("data-hub-operator","update", "object")
+      ))
    )
+  let $_ := xdmp:log(("DAE-Modified-content", $content))
 
   return $content 
 };
