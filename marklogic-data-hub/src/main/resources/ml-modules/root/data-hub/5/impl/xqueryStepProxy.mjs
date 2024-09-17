@@ -31,17 +31,15 @@ export default class XqueryStepProxy {
 
   getFunctions(){
     console.log("returning function")
-    return {"main" : this.proxyMain} //function(x,y,z){xdmp.log(["DAE2", x, y, z])}}  //require(this.moduleLibraryURI ).main}
+    return {"main" : this.proxyMain} 
   }
  
   proxy(functionName, content, options, context){
 
-    xdmp.log(["DAE3", this.moduleLibraryURI, content, options, context])
     var proxyContent  = xdmp.fromJSON(content)
     var proxyOptions  = xdmp.fromJSON(options)
     var targetModule = require(this.moduleLibraryURI)
     var modifiedContent = targetModule[functionName](proxyContent, proxyOptions)
-    xdmp.log(["DAE - modifiedcontent", modifiedContent])
     content.uri = modifiedContent.uri
     content.value = modifiedContent.value
     content.context = {... content.context}

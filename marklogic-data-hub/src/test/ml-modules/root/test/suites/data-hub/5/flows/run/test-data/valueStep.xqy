@@ -18,7 +18,7 @@ declare function custom:main(
   $options as map:map
 ){
 
-  let $_ := xdmp:log(("DAE - in Main", "-", $content, "--", $options, "--"))
+
 
   let $doc := $content=>map:get("value")
 
@@ -48,7 +48,6 @@ declare function custom:main(
         xdmp:permission("data-hub-operator","update", "object")
       ))
    )
-  let $_ := xdmp:log(("DAE-Modified-content", $content))
 
   return $content 
 };

@@ -74,7 +74,6 @@ export default class StepDefinition {
     if (!cachedModules.has(moduleLibraryURI)) {
       let extension = moduleLibraryURI.split(".").pop();
       if (extension === "xqy") {
-        xdmp.log("DAE-XQY")
         return new XqueryStepProxy().setModuleLibraryURI(moduleLibraryURI).getFunctions()
       }
       else if (extension === "mjs") {
