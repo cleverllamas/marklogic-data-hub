@@ -14,15 +14,16 @@ function xqueryTest() {
     uris: "test-data"
   };
 
-  const content = datahub.flow.findMatchingContent("CustomerByValue", "1", options);
+  const content = xdmp.invokeFunction(function(){datahub.flow.findMatchingContent("CustomerByValue", "1", options)}, {update:true};
 
   xdmp.log(["DAE - matchingContent", content])
+  xdmp.invokeFunction(function(){
   const uri  = "/processed/customer1-xquery.json"
   assertions.push(
     test.assertEqual(1, content.length),
-    test.asserttrue(xdmp.documentGetCollections(uri).toString()  == ["value-collection", "CustomerByValue", "test-data-xqy"].toString(), "same collections"),
-    test.asserttrue(JSON.stringify({ ... xdmp.documentGetPermissions(uri),}) == '{"0":{"capability":"update","roleId":"7004461930022123088"},"1":{"capability":"read","roleId":"7004461930022123088"}}', "permissions"),
-       test.asserttrue(
+    test.assertTrue(xdmp.documentGetCollections(uri).toString()  == ["value-collection", "CustomerByValue", "test-data-xqy"].toString(), "same collections"),
+    test.assertTrue(JSON.stringify({ ... xdmp.documentGetPermissions(uri),}) == '{"0":{"capability":"update","roleId":"7004461930022123088"},"1":{"capability":"read","roleId":"7004461930022123088"}}', "permissions"),
+    test.assertTrue(
       JSON.stringify({ ... xdmp.documentGetMetadata(uri), ... {"datahubCreatedOn" : null, "datahubCreatedBy": null}})
       == 
       JSON.stringify({
@@ -37,6 +38,7 @@ function xqueryTest() {
       , "same collections"
     )
   );
+  }, {"database" : xdmp.database("data-hub-FINAL")})
 
   const response = datahub.flow.runFlow(flowName, 'value-test-job-xquery', content, options, 1);
 

@@ -20,7 +20,7 @@ xquery version "1.0-ml";
       "/processed/customer1-xquery.json"
     )
   },
-    map:entry("database", "data-hub-FINAL")
+    map:entry("database", xdmp.database("data-hub-FINAL"))
   )
 
 )
