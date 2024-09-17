@@ -16,11 +16,9 @@ xquery version "1.0-ml";
 
 
   xdmp:invoke-function(function() {
-    xdmp:document-delete(
-      "/processed/customer1-xquery.json"
-    )
+    cts:uri-match("/processed/customer1-xquery.json") ! xdmp:document-delete(.)
   },
-    map:entry("database", xdmp.database("data-hub-FINAL"))
+    map:entry("database", xdmp:database("data-hub-FINAL"))
   )
 
 )

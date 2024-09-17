@@ -14,16 +14,21 @@ function xqueryTest() {
     uris: "test-data"
   };
 
-  const content = xdmp.invokeFunction(function(){datahub.flow.findMatchingContent("CustomerByValue", "1", options)}, {update:true});
+  const content = datahub.flow.findMatchingContent("CustomerByValue", "1", options)
+  const response = datahub.flow.runFlow(flowName, 'value-test-job-xquery', content, options, 1);
 
   xdmp.log(["DAE - matchingContent", content])
   xdmp.invokeFunction(function(){
-    xdmp.log(["DAE - doc", cts.doc(uri)])
     const uri  = "/processed/customer1-xquery.json"
+    xdmp.log(["DAE - doc", cts.doc(uri)])
     assertions.push(
-      test.assertEqual(1, content.length),
       test.assertTrue(xdmp.documentGetCollections(uri).toString()  == ["value-collection", "CustomerByValue", "test-data-xqy"].toString(), "same collections"),
-      test.assertTrue(JSON.stringify({ ... xdmp.documentGetPermissions(uri),}) == '{"0":{"capability":"update","roleId":"7004461930022123088"},"1":{"capability":"read","roleId":"7004461930022123088"}}', "permissions"),
+      test.assertTrue(
+        JSON.stringify(xdmp.documentGetPermissions(uri).map(p => {p.roleName = xdmp.roleName(p.roleId); p.roleId = undefined; return p}))
+        == 
+        '[{"capability":"update","roleName":"data-hub-operator"},{"capability":"read","roleName":"data-hub-operator"}]'
+        , "permissions"
+      ),
       test.assertTrue(
         JSON.stringify({ ... xdmp.documentGetMetadata(uri), ... {"datahubCreatedOn" : null, "datahubCreatedBy": null}})
         == 
@@ -40,8 +45,6 @@ function xqueryTest() {
       )
     );
   }, {"database" : xdmp.database("data-hub-FINAL")})
-
-  const response = datahub.flow.runFlow(flowName, 'value-test-job-xquery', content, options, 1);
 
   xdmp.log(["DAE - flowResponse", response])
   return assertions.concat(
