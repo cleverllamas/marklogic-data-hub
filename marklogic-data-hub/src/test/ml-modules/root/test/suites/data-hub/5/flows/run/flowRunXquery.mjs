@@ -14,7 +14,7 @@ function xqueryTest() {
     uris: "test-data"
   };
 
-  const content = xdmp.invokeFunction(function(){datahub.flow.findMatchingContent("CustomerByValue", "1", options)}, {update:true};
+  const content = xdmp.invokeFunction(function(){datahub.flow.findMatchingContent("CustomerByValue", "1", options)}, {update:true});
 
   xdmp.log(["DAE - matchingContent", content])
   xdmp.invokeFunction(function(){
